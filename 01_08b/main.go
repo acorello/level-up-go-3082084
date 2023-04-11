@@ -42,13 +42,19 @@ func (f *Friends) getRandomFriend() Friend {
 
 // spreadGossip ensures that all the friends in the map have heard the news
 func spreadGossip(root Friend, friends Friends) {
-	panic("NOT IMPLEMENTED")
+	root.hearGossip()
+	delete(friends.fmap, root.ID)
+	for _, f := range root.Friends {
+		nextRoot := friends.getFriend(f)
+		if nextRoot.ID != "" {
+			spreadGossip(nextRoot, friends)
+		}
+	}
 }
 
 func main() {
 	friends := importData()
 	root := friends.getRandomFriend()
-	root.hearGossip()
 	spreadGossip(root, friends)
 }
 
