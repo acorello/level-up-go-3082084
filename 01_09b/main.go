@@ -19,35 +19,28 @@ type Song struct {
 }
 
 // makePlaylist makes the merged sorted list of songs
-func makePlaylist(albums [][]Song) []Song {
-	sor := func(songs []Song) {
-		// sorting algorithms
-		sort.Slice(songs, func(i, j int) bool {
-			return songs[i].PlayCount < songs[j].PlayCount
-		})
-	}
+func makePlaylist(albums [][]Song) (result []Song) {
 	switch len(albums) {
 	case 0:
-		return nil
+		result = []Song{}
 	case 1:
-		album := albums[0]
-		result := make([]Song, len(album))
-		copy(result, album)
-		sor(result)
-		return result
-	}
-	songs := map[Song]int64{}
-	for _, album := range albums {
-		for _, song := range album {
-			playCount := song.PlayCount
-			song.PlayCount = 0 // because we use the song as key
-			songs[song] += playCount
+		onlyAlbum := albums[0]
+		result = make([]Song, len(onlyAlbum))
+		copy(result, onlyAlbum)
+	default:
+		songs := map[Song]int64{}
+		for _, album := range albums {
+			for _, song := range album {
+				playCount := song.PlayCount
+				song.PlayCount = 0 // because we use the song as key
+				songs[song] += playCount
+			}
 		}
-	}
-	result := make([]Song, 0, len(songs))
-	for song, count := range songs {
-		song.PlayCount = count
-		result = append(result, song)
+		result = make([]Song, 0, len(songs))
+		for song, count := range songs {
+			song.PlayCount = count
+			result = append(result, song)
+		}
 	}
 	sort.Slice(result, func(i, j int) bool {
 		return result[i].PlayCount > result[j].PlayCount
