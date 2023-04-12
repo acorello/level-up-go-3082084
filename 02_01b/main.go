@@ -2,7 +2,8 @@ package main
 
 import (
 	"flag"
-	"log"
+	"fmt"
+	"sync"
 )
 
 var messages = []string{
@@ -14,15 +15,23 @@ var messages = []string{
 }
 
 // repeat concurrently prints out the given message n times
-func repeat(n int, message string) {
-	panic("NOT IMPLEMENTED")
+func repeatWG(n int, message string) {
+	wg := sync.WaitGroup{}
+	defer wg.Wait()
+	wg.Add(n)
+	for i := n; i > 0; i-- {
+		go func() {
+			fmt.Println(message)
+			defer wg.Done()
+		}()
+	}
 }
 
 func main() {
 	factor := flag.Int64("factor", 0, "The fan-out factor to repeat by")
 	flag.Parse()
 	for _, m := range messages {
-		log.Println(m)
-		repeat(int(*factor), m)
+		fmt.Println(m)
+		repeatWG(int(*factor), m)
 	}
 }
