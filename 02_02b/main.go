@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"math/rand"
+	"sync"
 	"time"
 )
 
@@ -74,5 +75,15 @@ func main() {
 }
 
 func executeWalk(ownerActions []func(), dogActions []func()) {
-	panic("NOT IMPLEMENTED")
+	execAll := func(wg *sync.WaitGroup, actions []func()) {
+		defer wg.Done()
+		for _, action := range actions {
+			action()
+		}
+	}
+	var wg sync.WaitGroup
+	defer wg.Wait()
+	wg.Add(2)
+	go execAll(&wg, ownerActions)
+	go execAll(&wg, dogActions)
 }
